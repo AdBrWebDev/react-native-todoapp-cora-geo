@@ -10,9 +10,9 @@ export default function App() {
   return (
     <NativeBaseProvider>
       <SafeAreaView>
+      <Nav />
       <Form />
       <List />
-      <Nav />
     </SafeAreaView>
     </NativeBaseProvider>
   );

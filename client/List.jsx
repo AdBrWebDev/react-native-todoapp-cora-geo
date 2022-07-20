@@ -1,42 +1,50 @@
 import React from 'react';
-import { Box, FlatList, Heading, Avatar, HStack, VStack, Text, Spacer, Center, NativeBaseProvider } from "native-base";
+import { Box, FlatList, Heading, Avatar, HStack, VStack, Text, Input, Spacer, Center, NativeBaseProvider, Button, Icon, Modal } from "native-base";
+import {AntDesign, Entypo} from '@expo/vector-icons';
+import Axios from 'axios'
 
 export default class extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            data: [{
-                id: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
-                fullName: "Aafreen Khan",
-                timeStamp: "12:47 PM",
-                recentText: "Good Day!",
-                avatarUrl: "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
-              }, {
-                id: "3ac68afc-c605-48d3-a4f8-fbd91aa97f63",
-                fullName: "Sujitha Mathur",
-                timeStamp: "11:11 PM",
-                recentText: "Cheer up, there!",
-                avatarUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyEaZqT3fHeNrPGcnjLLX1v_W4mvBlgpwxnA&usqp=CAU"
-              }, {
-                id: "58694a0f-3da1-471f-bd96-145571e29d72",
-                fullName: "Anci Barroco",
-                timeStamp: "6:22 PM",
-                recentText: "Good Day!",
-                avatarUrl: "https://miro.medium.com/max/1400/0*0fClPmIScV5pTLoE.jpg"
-              }, {
-                id: "68694a0f-3da1-431f-bd56-142371e29d72",
-                fullName: "Aniket Kumar",
-                timeStamp: "8:56 PM",
-                recentText: "All the best",
-                avatarUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSr01zI37DYuR8bMV5exWQBSw28C1v_71CAh8d7GP1mplcmTgQA6Q66Oo--QedAN1B4E1k&usqp=CAU"
-              }, {
-                id: "28694a0f-3da1-471f-bd96-142456e29d72",
-                fullName: "Kiara",
-                timeStamp: "12:47 PM",
-                recentText: "I will call today.",
-                avatarUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBwgu1A5zgPSvfE83nurkuzNEoXs9DMNr8Ww&usqp=CAU"
-              }],
+            openEdit: false,
+            openInfo: false,
+            editedText: "",
+            data: [],
         }
+        this.delete = this.delete.bind(this);
+        this.editItem = this.editItem.bind(this);
+        this.showInfo = this.showInfo.bind(this);
+        this.editText = this.editText.bind(this);
+    }
+
+    componentDidMount() {
+        const {data: response} = Axios.get("http://localhost:5000/getTodos")
+        this.setState({
+            data: response
+        })
+    }
+
+    showInfo = () => {
+        this.setState({
+            openInfo: !this.state.openInfo
+        })
+    }
+
+    editItem = () => {
+        this.setState({
+            openEdit: !this.state.openEdit
+        })
+    }
+
+    delete = () => {
+        return;
+    }
+
+    editText = (e) => {
+        this.setState({
+            editedText: e.target.value
+        })
     }
 
     render() {
@@ -51,30 +59,39 @@ export default class extends React.Component {
       borderColor: "gray.600"
     }} borderColor="coolGray.200" pl="4" pr="5" py="2">
             <HStack space={3} justifyContent="space-between">
-              <Avatar size="48px" source={{
-          uri: item.avatarUrl
-        }} />
-              <VStack>
-                <Text _dark={{
-            color: "warmGray.50"
-          }} color="coolGray.800" bold>
-                  {item.fullName}
-                </Text>
-                <Text color="coolGray.600" _dark={{
-            color: "warmGray.200"
-          }}>
-                  {item.recentText}
-                </Text>
-              </VStack>
+              <Text fontSize="xl">{item.fullName}</Text> 
               <Spacer />
-              <Text fontSize="xs" _dark={{
-          color: "warmGray.50"
-        }} color="coolGray.800" alignSelf="flex-start">
-                {item.timeStamp}
-              </Text>
+              <Button  variant="ghost" onPress={this.delete} colorScheme="secondary" endIcon={<Icon as={AntDesign} name="delete" />}></Button>
+              <Button variant="ghost" onPress={this.editItem} endIcon={<Icon as={Entypo} name="edit" />}></Button>
+              <Button variant="ghost" onPress={this.showInfo} endIcon={<Icon as={Entypo} name="info" />}></Button>
             </HStack>
+            <Modal isOpen={this.state.openInfo} onClose={this.showInfo} size="lg">
+          <Modal.Content maxWidth="350">
+          <Modal.CloseButton />
+          <Modal.Header>{item.fullName}</Modal.Header>
+          <Modal.Body>
+            <Text>{item.fullName}</Text>
+          </Modal.Body>
+    
+        </Modal.Content>
+      </Modal>
+            <Modal isOpen={this.state.openEdit} onClose={this.editItem} size="lg">
+          <Modal.Content maxWidth="350">
+          <Modal.CloseButton />
+          <Modal.Header>{item.fullName}</Modal.Header>
+          <Modal.Body>
+            <Text>{item.fullname}</Text>
+            <Input type="text" value={this.state.editedText} onChange={this.editText} /> 
+          </Modal.Body>
+          <Modal.Footer>
+          <Button flex="1" onPress={() => {this.setState({ openInfo: false })}}>
+              Continue
+            </Button>
+          </Modal.Footer>
+        </Modal.Content>
+      </Modal>
           </Box>} keyExtractor={item => item.id} />
     </Box>
         )
-    }
+    }   
 }
