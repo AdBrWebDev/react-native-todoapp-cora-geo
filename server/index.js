@@ -15,7 +15,7 @@ const bcrypt = require('bcrypt');
 
 
 const dbcon = mysql.createPool({
-    host: 'localhost',
+    host: '192.168.0.155',
     user: 'root',
     password: '',
     database: 'todoapp',
@@ -24,11 +24,11 @@ const dbcon = mysql.createPool({
 app.use(express.json());
 app.use(express.urlencoded({extended: true}))
 
-app.use(cors({
+/*app.use(cors({
     origin: "http://localhost:19002",
     methods: ['GET', 'POST'], 
     credentials: true
-}));
+}));*/
 
 app.post('/login', function(req, res){
     const {username, password} = req.body;
