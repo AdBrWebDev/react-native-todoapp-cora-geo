@@ -22,7 +22,7 @@ export default function Form() {
             <View>
                 <Center>
                     <Container>
-                        <Input placeholder="What needs to be done?" value={text} onChangeText={(value) => {setText(value); console.log(value)}} my="3" />
+                        <Input placeholder="What needs to be done?" value={text} onChangeText={(value) => setText(value)} my="3" />
                         <Box mx="auto">
                             <Button variant="subtle" onPress={() => hSubmit()} endIcon={<Icon as={FontAwesome} name="send" />} size="md"></Button>
                         </Box>

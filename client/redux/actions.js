@@ -29,9 +29,10 @@ export const TodoListActions = createSlice({
             const item = {
                 text: action.payload,
                 id: Date.now(),
+                created: new Date().getDate() + "."+ new Date().getMonth() + "." + new Date().getFullYear(),
+                status: 0,
             }
             state.items.push(item)
-                console.log(state.items)
         },
 
         editData: (state, action) => {
@@ -41,9 +42,7 @@ export const TodoListActions = createSlice({
         },
 
         handleDelete: (state, action) => {
-            Axios.post(`${state.server}/deleteTodo`, {id: action.payload}).then((response) => {
-                console.log(response.data)
-              })
+            state.items = state.items.filter(item => item.id !== action.payload)
         }
     }}
 );
