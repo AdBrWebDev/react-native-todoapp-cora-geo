@@ -1,20 +1,20 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import {Box, FlatList, IconButton, Heading, Switch, Icon, Button } from 'native-base';
-import { SimpleLineIcons } from '@expo/vector-icons';
+import { Heading } from 'native-base';
+import { AntDesign } from '@expo/vector-icons';
+import { useDispatch, useSelector } from 'react-redux';
 
-export default class Nav extends React.Component {
+export default function Nav() {
     
-    render() {
         return(
         <View style={styles.nav}>
             <Heading style={styles.heading} size="xl">Todo-app</Heading>
-            <View style={styles.switch}>
-            <Switch colorScheme="primary" />
+            <View style={styles.settingBtn}>
+            <AntDesign name="setting" size={24} color="black" />
             </View>
+            <SettingModal />
         </View>
         )
-    }
 } 
 
 const styles = StyleSheet.create({
@@ -24,12 +24,10 @@ const styles = StyleSheet.create({
         display: 'flex',
         width: '100%',
     },
-    switch:{
+    settingBtn: {
         position: 'absolute',
         right: 20,
-        top: 6,
-        display: 'flex',
-        width: '50%',
+        top: 15,
     },
     heading:{
       left: 10,

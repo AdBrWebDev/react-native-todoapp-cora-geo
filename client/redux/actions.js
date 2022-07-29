@@ -1,5 +1,4 @@
 import {createSlice} from '@reduxjs/toolkit';
-import Axios from 'axios'
 
 export const TodoListActions = createSlice({
     name: "todoList",
@@ -11,21 +10,6 @@ export const TodoListActions = createSlice({
     reducers: {
 
         handleSubmit: (state,action) => {
-            /*Axios.post(`${state.server}/sendTodo`, {text: action.payload}).then((response) => {
-                  console.log(response.data)
-                  if(response.status === 200){
-                    Axios.get(`${state.server}/getTodos`).then((response) => {
-                        //this.state.push(...state.items, response.data)
-                        //state.items = response.data
-                        console.log(response.data)
-                        console.log(response.status)
-                    })
-                  }
-                  else{
-                    console.log("Error")
-                  }
-                })*/
-
             const item = {
                 text: action.payload,
                 id: Date.now(),
@@ -36,9 +20,7 @@ export const TodoListActions = createSlice({
         },
 
         editData: (state, action) => {
-            Axios.post(`${state.server}/editTodo`, {text: action.payload.text, id: action.payload.id, status: action.payload.status}).then((response) => {
-                  console.log(response.data)
-            })
+            return;
         },
 
         handleDelete: (state, action) => {

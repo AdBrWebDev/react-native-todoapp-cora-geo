@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
-import { Box, FlatList, Heading, HStack, Text, Input, Spacer, Button, Icon, Modal, Select, CheckIcon } from "native-base";
-import {AntDesign, Entypo} from '@expo/vector-icons';
-import Axios from 'axios'
+import { Box, FlatList, Heading, HStack, Text, Input, Spacer, Button, Icon, Modal, Select, CheckIcon, Center } from "native-base";
+import {AntDesign, Entypo, MaterialCommunityIcons} from '@expo/vector-icons';
 import {useDispatch, useSelector} from 'react-redux'
 import { handleDelete } from './redux/actions';
+import { StyleSheet } from 'react-native';
 
 export default function() {
   const [openEdit, setOpenEdit] = useState(false);
@@ -18,6 +18,7 @@ export default function() {
       <Heading fontSize="xl" p="4" pb="3">
         Items
       </Heading>
+      {data.length > 0 ? 
       <FlatList data={data} renderItem={({
       item
     }) => <Box borderBottomWidth="1" _dark={{
@@ -36,7 +37,7 @@ export default function() {
           <Modal.Header>{item.text}</Modal.Header>
           <Modal.Body>
             <Text>Created: {item.created}</Text>
-            <Text>Status: {item.status}</Text>
+            <Text>Status: {(item.status === 0) ? "Active" : (item.status === 1) ? "Done" : "Finished"}</Text>
           </Modal.Body>
     
         </Modal.Content>
@@ -66,7 +67,23 @@ export default function() {
           </Modal.Footer>
         </Modal.Content>
       </Modal>
-          </Box>} /*keyExtractor={item => item.id}*/ />
+          </Box>} /*keyExtractor={item => item.id}*/ /> : <Center>
+          <MaterialCommunityIcons name="playlist-remove" style={styles.emptyList} size={160} color="black" />
+            <Text style={styles.emptyListText}>No items</Text>
+            </Center>}
     </Box>
         )  
 }
+
+const styles = StyleSheet.create({
+  emptyList: {
+    opacity: 0.3,
+    marginTop: 50,
+  },
+  emptyListText: {
+    fontSize: 20,
+    marginTop: 20,
+    opacity: 0.3,
+    fontWeight: "bold",
+  }
+})
