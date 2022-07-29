@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import { Box, FlatList, Heading, HStack, Text, Input, Spacer, Button, Icon, Modal, Select, CheckIcon, Center } from "native-base";
 import {AntDesign, Entypo, MaterialCommunityIcons} from '@expo/vector-icons';
 import {useDispatch, useSelector} from 'react-redux'
-import { handleDelete } from './redux/actions';
+import { handleDelete } from '../redux/actions';
 import { StyleSheet } from 'react-native';
 
 export default function() {

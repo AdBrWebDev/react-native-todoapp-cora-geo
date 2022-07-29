@@ -4,10 +4,15 @@ export const TodoListActions = createSlice({
     name: "todoList",
     initialState: {
         items: [], 
-        server: "http://localhost:5000"
+        loading: false,
+        header: "Todo-app",
+        modal: false,
     },
 
     reducers: {
+        openModal: (state, action) => {
+            state.modal = !state.modal;
+        },
 
         handleSubmit: (state,action) => {
             const item = {
@@ -29,6 +34,6 @@ export const TodoListActions = createSlice({
     }}
 );
 
-export const {handleSubmit, handleDelete, editData} = TodoListActions.actions;
+export const {handleSubmit, handleDelete, editData, openModal} = TodoListActions.actions;
 
 export default TodoListActions.reducer;

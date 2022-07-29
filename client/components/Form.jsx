@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {View} from 'react-native'
 import { FontAwesome } from '@expo/vector-icons';
-import {handleSubmit} from './redux/actions'
+import {handleSubmit} from '../redux/actions'
 import {Input, Box, Button, Icon, Container, Center, Divider} from 'native-base'
 import { useDispatch } from 'react-redux';
 
