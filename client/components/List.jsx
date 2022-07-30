@@ -1,43 +1,49 @@
 import React, {useState} from 'react';
 import { Box, FlatList, Heading, HStack, Text, Input, Spacer, Button, Icon, Modal, Select, CheckIcon, Center } from "native-base";
-import {AntDesign, Entypo, MaterialCommunityIcons} from '@expo/vector-icons';
+import {AntDesign, Entypo, MaterialCommunityIcons, MaterialIcons} from '@expo/vector-icons';
 import {useDispatch, useSelector} from 'react-redux'
-import { handleDelete } from '../redux/actions';
-import { StyleSheet } from 'react-native';
+import { handleDelete, editItem } from '../redux/actions';
+import { StyleSheet, ScrollView } from 'react-native';
+import Filter from './Filter';
 
-export default function() {
+export default function List() {
   const [openEdit, setOpenEdit] = useState(false);
   const [openInfo, setOpenInfo] = useState(false);
   const [editedText, setEditedText] = useState('');
-  const [service, setService] = useState("");
+  const [values, setValues] = useState([])
+  const [status, setStatus] = useState("");
   const data = useSelector(state => state.todoList.items)
   const dispatch = useDispatch()
 
         return (
-            <Box>
-      <Heading fontSize="xl" p="4" pb="3">
+            <Box style={styles.list}>
+      <Box><Heading fontSize="xl" p="4" pb="3">
         Items
       </Heading>
+      <Filter />
+      </Box>
       {data.length > 0 ? 
-      <FlatList data={data} renderItem={({
+
+      <FlatList style={styles.list} data={data} renderItem={({
       item
-    }) => <Box borderBottomWidth="1" _dark={{
+    }) => <Box bg={(item.status === 0) ? "muted.50" : (item.status === 1) ? "secondary.300" : "tertiary.300"} borderBottomWidth="1" _dark={{
       borderColor: "gray.600"
     }} borderColor="coolGray.200" pl="4" pr="5" py="2">
             <HStack space={3} justifyContent="space-between">
-              <Text fontSize="xl">{item.text}</Text> 
+              <Text style={styles.itemText} fontSize="xl">{item.text}</Text> 
               <Spacer />
-              <Button  variant="ghost" colorScheme="secondary" onPress={() => dispatch(handleDelete(item.id))}endIcon={<Icon as={AntDesign} name="delete" />}></Button>
-              <Button variant="ghost" onPress={() => setOpenEdit(true)} endIcon={<Icon as={Entypo} name="edit" />}></Button>
-              <Button variant="ghost" onPress={() => setOpenInfo(true)} endIcon={<Icon as={Entypo} name="info" />}></Button>
+              <Button style={styles.listBtn} variant="ghost" colorScheme="secondary" onPress={() => dispatch(handleDelete(item.id))}endIcon={<Icon as={AntDesign} name="delete" />}></Button>
+              <Button style={styles.listBtn} variant="ghost" onPress={() => {setOpenEdit(true); setValues({id: item.id, text: item.text, status: item.status, created: item.created})}} endIcon={<Icon as={Entypo} name="edit" />}></Button>
+              <Button style={styles.listBtn} variant="ghost" onPress={() => {setOpenInfo(true); setValues({id: item.id, text: item.text, status: item.status, created: item.created, updated: item.updated})}} endIcon={<Icon as={Entypo} name="info" />}></Button>
             </HStack>
             <Modal isOpen={openInfo} onClose={() => setOpenInfo(false)} size="lg">
           <Modal.Content maxWidth="350">
           <Modal.CloseButton />
-          <Modal.Header>{item.text}</Modal.Header>
+          <Modal.Header>{values.text}</Modal.Header>
           <Modal.Body>
-            <Text>Created: {item.created}</Text>
-            <Text>Status: {(item.status === 0) ? "Active" : (item.status === 1) ? "Done" : "Finished"}</Text>
+            <Text>Created: {values.created}</Text>
+            <Text>{(values.updated) ? `Updated: ${values.updated}` : null}</Text>
+            <Text>Status: {(values.status === 0) ? "Active" : (item.status === 1) ? "Done" : "Finished"}</Text>
           </Modal.Body>
     
         </Modal.Content>
@@ -45,29 +51,36 @@ export default function() {
             <Modal isOpen={openEdit} onClose={() => setOpenEdit(false)} size="lg">
           <Modal.Content maxWidth="350">
           <Modal.CloseButton />
-          <Modal.Header>{item.text}</Modal.Header>
+          <Modal.Header>{values.text}</Modal.Header>
           <Modal.Body>
             <Input type="text" placeholder="Change text" value={editedText} onChangeText={(value) => setEditedText(value)} /> 
 
             <Box w="3/4" maxW="300">
-        <Select selectedValue={service} minWidth="200" accessibilityLabel="Change status" placeholder="Change status" _selectedItem={{
+        <Select selectedValue={status} minWidth="200" accessibilityLabel="Change status" placeholder="Change status" _selectedItem={{
         bg: "teal.600",
         endIcon: <CheckIcon size="5" />
-      }} mt={1} onValueChange={itemValue => setService(itemValue)}>
+      }} mt={1} onValueChange={itemValue => setStatus(itemValue)}>
           <Select.Item label="Active" value={0} />
-          <Select.Item label="Done" value={1} />
-          <Select.Item label="Finished" value={2} />
+          <Select.Item label="In progress" value={1} />
+          <Select.Item label="Done" value={2} />
         </Select>
       </Box>
           </Modal.Body>
           <Modal.Footer>
-          <Button flex="1" onPress={() => {}}>
-              Continue
+            <Box mx="auto">
+          <Button onPress={() => {
+            dispatch(editItem({status: (status === "") ? status : values.status, text: (editedText === "") ? values.text : editedText, id: values.id, created: values.created  })); 
+            setOpenEdit(false)
+            setStatus("")
+            setEditedText("")
+            }}>
+              <MaterialIcons name="published-with-changes" size={28} color="white" />
             </Button>
+            </Box>
           </Modal.Footer>
         </Modal.Content>
       </Modal>
-          </Box>} /*keyExtractor={item => item.id}*/ /> : <Center>
+          </Box>} keyExtractor={item => item.id} /> : <Center>
           <MaterialCommunityIcons name="playlist-remove" style={styles.emptyList} size={160} color="black" />
             <Text style={styles.emptyListText}>No items</Text>
             </Center>}
@@ -85,5 +98,17 @@ const styles = StyleSheet.create({
     marginTop: 20,
     opacity: 0.3,
     fontWeight: "bold",
+  },
+  listBtn: {
+    zIndex: 5,
+    justifyContent: "center",
+    },
+  itemText: {
+    maxWidth: "47%",
+  },
+  list: {
+    marginTop: 10,
+    height: "100%",
+    overflow: "scroll",
   }
 })

@@ -5,13 +5,21 @@ export const TodoListActions = createSlice({
     initialState: {
         items: [], 
         loading: false,
-        header: "Todo-app",
         modal: false,
+        darkMode: false,
     },
 
     reducers: {
         openModal: (state, action) => {
             state.modal = !state.modal;
+        },
+
+        setDarkMode: (state, action) => {
+            state.darkMode = !state.darkMode;
+        },
+
+        saveSettings: (state, action) => {
+            return;
         },
 
         handleSubmit: (state,action) => {
@@ -24,16 +32,27 @@ export const TodoListActions = createSlice({
             state.items.push(item)
         },
 
-        editData: (state, action) => {
-            return;
+        editItem: (state, action) => {
+            const editItem = {
+                text: action.payload.text,
+                status: action.payload.status,
+                id: action.payload.id,
+                created: action.payload.created,
+                updated: new Date().getDate() + "."+ new Date().getMonth() + "." + new Date().getFullYear(),
+            }
+            console.log(editItem)
         },
 
         handleDelete: (state, action) => {
             state.items = state.items.filter(item => item.id !== action.payload)
+        },
+
+        filterItems: (state, action) => {
+            return;
         }
     }}
 );
 
-export const {handleSubmit, handleDelete, editData, openModal} = TodoListActions.actions;
+export const {handleSubmit, handleDelete, editItem, filterItems, openModal, setDarkMode, saveSettings} = TodoListActions.actions;
 
 export default TodoListActions.reducer;
