@@ -1,3 +1,4 @@
+import React, {useEffect} from 'react';
 import { StatusBar } from 'expo-status-bar';
 import {View, KeyboardAvoidingView} from 'react-native'
 import { NativeBaseProvider } from 'native-base';
@@ -7,8 +8,12 @@ import List from './client/components/List';
 import Nav from './client/components/Nav';
 import {Provider} from 'react-redux';
 import store from './client/redux/store'
+import {createDatabase} from './client/database/db'
 
 export default function App() {
+
+  useEffect(() => createDatabase())
+
   return (
     <Provider store={store}>
     <NativeBaseProvider>

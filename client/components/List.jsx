@@ -3,7 +3,7 @@ import { Box, FlatList, Heading, HStack, Text, Input, Spacer, Button, Icon, Moda
 import {AntDesign, Entypo, MaterialCommunityIcons, MaterialIcons} from '@expo/vector-icons';
 import {useDispatch, useSelector} from 'react-redux'
 import { handleDelete, editItem } from '../redux/actions';
-import { StyleSheet, ScrollView } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Filter from './Filter';
 
 export default function List() {

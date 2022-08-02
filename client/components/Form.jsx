@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, StyleSheet, Text} from 'react-native'
 import { FontAwesome, AntDesign } from '@expo/vector-icons';
 import {handleSubmit} from '../redux/actions'
@@ -9,7 +9,7 @@ export default function Form() {
     const toast = useToast();
     const [text, setText] = useState('');
     const dispatch = useDispatch();
-
+    
     const hSubmit = () => {
         if(text === '') {
             toast.show({render: () => {
@@ -57,6 +57,6 @@ const styles = StyleSheet.create({
         color: "rgba(149, 19, 25, 0.8)",
     }, 
     form: {
-        zIndex: 10,
+        zIndex: 20,
     }
 })

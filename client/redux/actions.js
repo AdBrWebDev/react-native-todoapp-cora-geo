@@ -1,12 +1,15 @@
 import {createSlice} from '@reduxjs/toolkit';
+import {AsyncStorage} from '@react-native-async-storage/async-storage';
+import {newItem, updateItem, deleteItem, getAllItems} from '../database/db';
+
 
 export const TodoListActions = createSlice({
     name: "todoList",
     initialState: {
         items: [], 
-        loading: false,
         modal: false,
         darkMode: false,
+        colorMode: "light"
     },
 
     reducers: {
@@ -16,10 +19,15 @@ export const TodoListActions = createSlice({
 
         setDarkMode: (state, action) => {
             state.darkMode = !state.darkMode;
+            if(colorMode === "light"){
+                state.colorMode = "dark";
+            }else{
+                state.colorMode = "light";
+            }
         },
 
         saveSettings: (state, action) => {
-            return;
+            AsyncStorage.setItem("darkMode", state.darkMode)
         },
 
         handleSubmit: (state,action) => {
@@ -30,6 +38,8 @@ export const TodoListActions = createSlice({
                 status: 0,
             }
             state.items.push(item)
+            newItem(item)
+            getAllItems()
         },
 
         editItem: (state, action) => {
@@ -41,10 +51,12 @@ export const TodoListActions = createSlice({
                 updated: new Date().getDate() + "."+ new Date().getMonth() + "." + new Date().getFullYear(),
             }
             console.log(editItem)
+            updateItem(editItem)
         },
 
         handleDelete: (state, action) => {
             state.items = state.items.filter(item => item.id !== action.payload)
+            deleteItem(action.payload)
         },
 
         filterItems: (state, action) => {
