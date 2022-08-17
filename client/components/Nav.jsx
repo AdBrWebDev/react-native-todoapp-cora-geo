@@ -1,18 +1,15 @@
 import { View, StyleSheet, Pressable } from 'react-native';
 import { Heading } from 'native-base';
 import { AntDesign } from '@expo/vector-icons';
-import { useDispatch } from 'react-redux';
 import SettingModal from './SettingModal';
-import { openModal } from '../redux/actions';
 
 export default function Nav() {
-        const dispatch = useDispatch()
 
         return(
         <View style={styles.nav}>
             <Heading style={styles.heading} size="xl">Todo-app</Heading>
             <View style={styles.settingBtn}>
-                <Pressable onPress={() => dispatch(openModal())}>
+                <Pressable>
                 <AntDesign name="setting" size={24} color="black" />
                 </Pressable>
             </View>

@@ -1,28 +1,37 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { Box, FlatList, Heading, HStack, Text, Input, Spacer, Button, Icon, Modal, Select, CheckIcon, Center } from "native-base";
 import {AntDesign, Entypo, MaterialCommunityIcons, MaterialIcons} from '@expo/vector-icons';
-import {useDispatch, useSelector} from 'react-redux'
-import { handleDelete, editItem } from '../redux/actions';
 import { StyleSheet } from 'react-native';
 import Filter from './Filter';
+import { deleteFromTable, editItem } from '../database/db';
+import * as SQLite from 'expo-sqlite'
+const db = SQLite.openDatabase('db.todoDb')
 
 export default function List() {
   const [openEdit, setOpenEdit] = useState(false);
   const [openInfo, setOpenInfo] = useState(false);
   const [editedText, setEditedText] = useState('');
   const [values, setValues] = useState([])
-  const [status, setStatus] = useState("");
-  const data = useSelector(state => state.todoList.items)
-  const dispatch = useDispatch()
+  const [status, setStatus] = useState(null);
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    db.transaction(tx => {
+      tx.executeSql('SELECT * FROM items', null,
+        (txObj, resultSet) => setData(resultSet.rows._array),
+        (txObj, error) => console.log('Error ', error)
+        )
+    });
+  })
 
         return (
             <Box style={styles.list}>
       <Box><Heading fontSize="xl" p="4" pb="3">
         Items
       </Heading>
-      <Filter />
+      <Filter items={data?.length} />
       </Box>
-      {data.length > 0 ? 
+      {data?.length > 0 ? 
 
       <FlatList style={styles.list} data={data} renderItem={({
       item
@@ -32,7 +41,7 @@ export default function List() {
             <HStack space={3} justifyContent="space-between">
               <Text style={styles.itemText} fontSize="xl">{item.text}</Text> 
               <Spacer />
-              <Button style={styles.listBtn} variant="ghost" colorScheme="secondary" onPress={() => dispatch(handleDelete(item.id))}endIcon={<Icon as={AntDesign} name="delete" />}></Button>
+              <Button style={styles.listBtn} variant="ghost" colorScheme="secondary" onPress={() => deleteFromTable({id: item.id})} endIcon={<Icon as={AntDesign} name="delete" />}></Button>
               <Button style={styles.listBtn} variant="ghost" onPress={() => {setOpenEdit(true); setValues({id: item.id, text: item.text, status: item.status, created: item.created})}} endIcon={<Icon as={Entypo} name="edit" />}></Button>
               <Button style={styles.listBtn} variant="ghost" onPress={() => {setOpenInfo(true); setValues({id: item.id, text: item.text, status: item.status, created: item.created, updated: item.updated})}} endIcon={<Icon as={Entypo} name="info" />}></Button>
             </HStack>
@@ -69,7 +78,7 @@ export default function List() {
           <Modal.Footer>
             <Box mx="auto">
           <Button onPress={() => {
-            dispatch(editItem({status: (status === "") ? status : values.status, text: (editedText === "") ? values.text : editedText, id: values.id, created: values.created  })); 
+            editItem({status: (status === null) ? status : values.status, text: (editedText === "") ? values.text : editedText, id: values.id  }); 
             setOpenEdit(false)
             setStatus("")
             setEditedText("")

@@ -1,14 +1,12 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {View, StyleSheet, Text} from 'react-native'
+import {insertIntoTable} from '../database/db'
 import { FontAwesome, AntDesign } from '@expo/vector-icons';
-import {handleSubmit} from '../redux/actions'
 import {Input, Box, Button, Icon, Container, Center, Divider, useToast} from 'native-base'
-import { useDispatch } from 'react-redux';
 
 export default function Form() {
     const toast = useToast();
     const [text, setText] = useState('');
-    const dispatch = useDispatch();
     
     const hSubmit = () => {
         if(text === '') {
@@ -16,8 +14,8 @@ export default function Form() {
                 return <Box style={styles.toaster} color="white" bg="secondary.300" px="2" py="1" rounded="lg" mb={5}><AntDesign style={styles.toasterIcon} name="warning" size={24} /> <Text style={styles.toastText}>Empty input</Text></Box>
             }});
         }else{
-            dispatch(handleSubmit(text));
             setText('');
+            insertIntoTable({text: text});
         }
     }
 

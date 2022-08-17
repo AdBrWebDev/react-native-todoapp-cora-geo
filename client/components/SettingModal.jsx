@@ -1,30 +1,25 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {StyleSheet, View, Text } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
-import { Modal, Button, Switch, Icon, Box, useColorMode, useToast } from 'native-base';
+import { Modal, Button, Switch, Icon, Box, useToast } from 'native-base';
 import { FontAwesome5, AntDesign } from '@expo/vector-icons';
-import {saveSettings, setDarkMode, openModal} from '../redux/actions';
 
 export default function SettingModal() {
     const toast = useToast();
-    const data = useSelector(state => state.todoList);
-    const dispatch = useDispatch();
     
 
     return(
-        <Modal isOpen={data.modal} onClose={() => dispatch(openModal())}>
+        <Modal isOpen={false}>
             <Modal.Content>
                 <Modal.CloseButton />
                 <Modal.Header>Settings</Modal.Header>
                 <Modal.Body>
                     <View>
                         <Text style={styles.darkMText}>Dark Mode</Text>
-                        <Switch style={styles.switch} isChecked={data.darkMode} onToggle={() => dispatch(setDarkMode())} colorScheme="emerald" size="lg" />
+                        <Switch style={styles.switch} colorScheme="emerald" size="lg" />
                     </View>
                     <Box mx="auto" mt="3">
                         <Button variant="subtle" style={styles.saveSetBtn} 
-                        onPress={() => {dispatch(saveSettings()); 
-                            dispatch(openModal()); 
+                        onPress={() => { 
                             toast.show({render: () => {
                                 return <Box style={styles.toaster} color="white" bg="tertiary.200" px="2" py="1" rounded="lg" mb={5}><AntDesign style={styles.toasterIcon} name="check" size={24} /> <Text style={styles.toastText}>Setting saved</Text></Box>
                             }});

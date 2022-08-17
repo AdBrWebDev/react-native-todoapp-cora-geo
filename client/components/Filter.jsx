@@ -2,17 +2,13 @@ import React, {useState} from 'react';
 import { Fab, Actionsheet, Box, Center, Text, View, Icon} from 'native-base'
 import { FontAwesome5 } from '@expo/vector-icons';
 import { StyleSheet } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
-import {filterItems} from '../redux/actions';
 
-export default function Filter(){
+export default function Filter(props){
     const [isOpen, onOpen] = useState(false)
-    const dispatch = useDispatch();
-    const data = useSelector(state => state.todoList.items);
 
     return(
         <View>
-            {(data.length === 0) ? null :
+            {(props.items === 0) ? null :
             <Fab onPress={() => onOpen(!isOpen)} bg="primary.600" style={styles.fab} renderInPortal={false} shadow={2} size="sm" icon={<Icon color="white" as={FontAwesome5} name="filter" />} />
             }
         <Center>
@@ -25,9 +21,9 @@ export default function Filter(){
               <FontAwesome5 name="filter" size={24} color="black" /> Filter Items
             </Text>
           </Box>
-          <Actionsheet.Item onPress={() => {dispatch(filterItems(0));  onOpen(!isOpen)}}>Active</Actionsheet.Item>
-          <Actionsheet.Item onPress={() => {dispatch(filterItems(1));  onOpen(!isOpen)}}>In Progress</Actionsheet.Item>
-          <Actionsheet.Item onPress={() => {dispatch(filterItems(2));  onOpen(!isOpen)}}>Done</Actionsheet.Item>
+          <Actionsheet.Item onPress={() => {  onOpen(!isOpen)}}>Active</Actionsheet.Item>
+          <Actionsheet.Item onPress={() => {  onOpen(!isOpen)}}>In Progress</Actionsheet.Item>
+          <Actionsheet.Item onPress={() => {  onOpen(!isOpen)}}>Done</Actionsheet.Item>
         </Actionsheet.Content>
       </Actionsheet>
     </Center>

@@ -1,47 +1,43 @@
 import * as SQLite from 'expo-sqlite'
+const db = SQLite.openDatabase('db.todoDb')
 
-const db = SQLite.openDatabase({name: 'todolist.db'});
-
-export const createDatabase = () => {
-db.transaction(tx => {
-    tx.executeSql(
-      'CREATE TABLE IF NOT EXISTS todo (id BIGINT PRIMARY KEY, text TEXT, created DATE, status INTEGER, updated DATE)',
-    )
-  })
-  console.log("table created")
+export function createDatabase () {
+  db.transaction(tx => {
+      tx.executeSql(
+        'CREATE TABLE IF NOT EXISTS items (id INTEGER PRIMARY KEY, text TEXT, created TEXT, status INTEGER, updated TEXT)',
+        [],
+        () => console.log("database created"),
+        error => console.log('error')
+      )
+    })
 }
 
-export const newItem = (item) => {
-    db.transaction(tx => {
-      tx.executeSql('INSERT INTO todo (id, text, created, status, updated) values (?, ?, ?, ?, ?)', [item.id, item.text, item.created, 0, null], (sqlTnx, res) => {
-      })
-    })
-  }
+export function insertIntoTable(props){
+  const created = new Date().getDate() + "."+ new Date().getMonth() + "." + new Date().getFullYear();
 
-  export const updateItem = (item) => {
-    db.transaction(tx => {
-      tx.executeSql('UPDATE todo SET status = ?, created = ?, updated = ?, text = ? WHERE id = ?', [item.status, item.created, item.updated, item.text, item.id], (sqlTnx, res) => {
-        console.log(sqlTnx, res)
-      })
-    })
-  }
+  db.transaction(tx => {
+    tx.executeSql('INSERT INTO items (id,text, created, status, updated) values (?, ?, ?, ?, ?)', 
+[Date.now(), props.text, created, 0, null],
+(sqlTnx, res) => console.log(res),
+error => console.log('error'))
+  })
+}
 
-  export const deleteItem = (id) => {
-    db.transaction(tx => {
-      tx.executeSql('DELETE FROM todos WHERE id = ?', [id], (sqlTnx, res) => {
-        console.log(sqlTnx, res)
-      })
-    })
-  }
+export function deleteFromTable(props){
+  db.transaction(tx => {
+    tx.executeSql('DELETE FROM items WHERE id = ?', 
+[props.id],
+(sqlTnx, res) => console.log(res),
+error => console.log('error'))
+  })
+}
 
-  export const getAllItems = () => {
-    return db.transaction(tx => {
-      tx.executeSql('SELECT * FROM todo', [], 
-        (tx, results) => {
-          let temp = [];
-          for (let i = 0; i < results.rows.length; ++i)
-            temp.push(results.rows.item(i));
-          console.log(temp);
-        })
-    })
-  }
+export function editItem(props){
+  const updated = new Date().getDate() + "."+ new Date().getMonth() + "." + new Date().getFullYear()
+  db.transaction(tx => {
+    tx.executeSql('UPDATE items SET updated = ?, status = ?, text = ? WHERE id = ?',
+[updated, props.status, props.text, props.id],
+(sqlTnx, res) => console.log(res),
+error => console.log('error'))
+  })
+}
