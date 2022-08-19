@@ -41,3 +41,12 @@ export function editItem(props){
 error => console.log('error'))
   })
 }
+
+export function deleteAllItemsDB(){
+  db.transaction(tx => {
+    tx.executeSql('DELETE FROM items',
+[],
+(sqlTnx, res) => console.log(res),
+error => console.log('error'))
+  })
+}

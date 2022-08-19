@@ -1,9 +1,8 @@
 import React, {useState, useEffect} from 'react';
-import { Box, FlatList, Heading, HStack, Text, Input, Spacer, Button, Icon, Modal, Select, CheckIcon, Center } from "native-base";
-import {AntDesign, Entypo, MaterialCommunityIcons, MaterialIcons} from '@expo/vector-icons';
-import { StyleSheet } from 'react-native';
-import Filter from './Filter';
-import { deleteFromTable, editItem } from '../database/db';
+import { Box, FlatList, Heading, Actionsheet, Fab, HStack, Text, Input, Spacer, Button, Icon, Modal, Select, CheckIcon, Center, Typography } from "native-base";
+import {AntDesign, Entypo, MaterialCommunityIcons, MaterialIcons, FontAwesome5} from '@expo/vector-icons';
+import { StyleSheet, View } from 'react-native';
+import { deleteFromTable, editItem, deleteAllItemsDB } from '../database/db';
 import * as SQLite from 'expo-sqlite'
 const db = SQLite.openDatabase('db.todoDb')
 
@@ -14,6 +13,8 @@ export default function List() {
   const [values, setValues] = useState([])
   const [status, setStatus] = useState(null);
   const [data, setData] = useState([]);
+  const [itemsModal, openItemsModal] = useState(false);
+  const [filter, openFilter] = useState(false)
 
   useEffect(() => {
     db.transaction(tx => {
@@ -22,20 +23,56 @@ export default function List() {
         (txObj, error) => console.log('Error ', error)
         )
     });
-  })
+  });
 
         return (
             <Box style={styles.list}>
       <Box><Heading fontSize="xl" p="4" pb="3">
         Items
       </Heading>
-      <Filter items={data?.length} />
+      <View>
+            {(data.length <= 1) ? null : <>
+            <Fab onPress={() => openFilter(!filter)} bg="primary.600" style={styles.fab} renderInPortal={false} shadow={2} size="sm" icon={<Icon color="white" as={FontAwesome5} name="filter" />} />
+            <Fab onPress={() => openItemsModal(!itemsModal)} bg="secondary.500" style={styles.fabDelete} renderInPortal={false} shadow={2} size="sm" icon={<Icon color="white" as={MaterialIcons} name="delete" />} />
+            </>
+            }
+        <Center>
+      <Actionsheet isOpen={filter} onClose={() => openFilter(!filter)}>
+        <Actionsheet.Content mx="auto">
+          <Box w="100%" h={60} px={4} justifyContent="center">
+            <Text fontSize="16" color="gray.500" _dark={{
+            color: "gray.300"
+          }}>
+              <FontAwesome5 name="filter" size={24} color="black" /> Filter Items
+            </Text>
+          </Box>
+          <Actionsheet.Item onPress={() => {openFilter(!filter);}}>All</Actionsheet.Item>
+          <Actionsheet.Item onPress={() => {openFilter(!filter);}}>Active</Actionsheet.Item>
+          <Actionsheet.Item onPress={() => {openFilter(!filter);}}>In Progress</Actionsheet.Item>
+          <Actionsheet.Item onPress={() => {openFilter(!filter);}}>Done</Actionsheet.Item>
+        </Actionsheet.Content>
+      </Actionsheet>
+    </Center>
+
+    <Modal isOpen={itemsModal} onClose={() => openItemsModal(false)} size="lg">
+          <Modal.Content maxWidth="350">
+          <Modal.CloseButton />
+          <Modal.Header>Remove all items from list ?</Modal.Header>
+          <Modal.Body>
+            <Box>
+            <Button mx="auto" colorScheme="secondary" onPress={() => {deleteAllItemsDB(); openItemsModal(false)}} ><Icon size="lg" color="white" as={MaterialIcons} name="delete" /></Button>
+            </Box>
+         </Modal.Body>
+        </Modal.Content>
+      </Modal>
+
+    </View>
       </Box>
       {data?.length > 0 ? 
 
       <FlatList style={styles.list} data={data} renderItem={({
       item
-    }) => <Box bg={(item.status === 0) ? "muted.50" : (item.status === 1) ? "secondary.300" : "tertiary.300"} borderBottomWidth="1" _dark={{
+    }) => <Box style={styles.listItem} bg={(item.status === 0) ? "muted.50" : (item.status === 1) ? "yellow.100" : "tertiary.100"} borderBottomWidth="1" _dark={{
       borderColor: "gray.600"
     }} borderColor="coolGray.200" pl="4" pr="5" py="2">
             <HStack space={3} justifyContent="space-between">
@@ -51,8 +88,8 @@ export default function List() {
           <Modal.Header>{values.text}</Modal.Header>
           <Modal.Body>
             <Text>Created: {values.created}</Text>
-            <Text>{(values.updated) ? `Updated: ${values.updated}` : null}</Text>
-            <Text>Status: {(values.status === 0) ? "Active" : (item.status === 1) ? "Done" : "Finished"}</Text>
+            {(values.updated) ? <Text>Updated: {values.updated}</Text> : null}
+            <Text>Status: {(values.status === 0) ? "Active" : (values.status === 1) ? "In progress" : "Finished"}</Text>
           </Modal.Body>
     
         </Modal.Content>
@@ -68,7 +105,7 @@ export default function List() {
         <Select selectedValue={status} minWidth="200" accessibilityLabel="Change status" placeholder="Change status" _selectedItem={{
         bg: "teal.600",
         endIcon: <CheckIcon size="5" />
-      }} mt={1} onValueChange={itemValue => setStatus(itemValue)}>
+      }} mt={1} onValueChange={itemValue => {setStatus(itemValue)}}>
           <Select.Item label="Active" value={0} />
           <Select.Item label="In progress" value={1} />
           <Select.Item label="Done" value={2} />
@@ -78,7 +115,7 @@ export default function List() {
           <Modal.Footer>
             <Box mx="auto">
           <Button onPress={() => {
-            editItem({status: (status === null) ? status : values.status, text: (editedText === "") ? values.text : editedText, id: values.id  }); 
+            editItem({status: (status !== null) ? status : values.status, text: (editedText === "") ? values.text : editedText, id: values.id  }); 
             setOpenEdit(false)
             setStatus("")
             setEditedText("")
@@ -119,5 +156,22 @@ const styles = StyleSheet.create({
     marginTop: 10,
     height: "100%",
     overflow: "scroll",
-  }
+  },
+  listItem: {
+    borderRadius: 15,
+    width: "98%",
+    marginLeft: "1%",
+  },
+
+
+  fab: {  
+    position: 'absolute',
+    bottom: 0,
+    right: 20
+},
+fabDelete: {  
+  position: 'absolute',
+  bottom: 0,
+  right: 80
+},
 })
