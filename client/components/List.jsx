@@ -14,7 +14,6 @@ export default function List() {
   const [status, setStatus] = useState(null);
   const [data, setData] = useState([]);
   const [itemsModal, openItemsModal] = useState(false);
-  const [filter, openFilter] = useState(false)
 
   useEffect(() => {
     db.transaction(tx => {
@@ -27,32 +26,14 @@ export default function List() {
 
         return (
             <Box style={styles.list}>
-      <Box><Heading fontSize="xl" p="4" pb="3">
+      <><Heading fontSize="xl" p="4" pb="3">
         Items
       </Heading>
       <View>
-            {(data.length <= 1) ? null : <>
-            <Fab onPress={() => openFilter(!filter)} bg="primary.600" style={styles.fab} renderInPortal={false} shadow={2} size="sm" icon={<Icon color="white" as={FontAwesome5} name="filter" />} />
+            {data.length <= 1 ? null : <>
             <Fab onPress={() => openItemsModal(!itemsModal)} bg="secondary.500" style={styles.fabDelete} renderInPortal={false} shadow={2} size="sm" icon={<Icon color="white" as={MaterialIcons} name="delete" />} />
             </>
             }
-        <Center>
-      <Actionsheet isOpen={filter} onClose={() => openFilter(!filter)}>
-        <Actionsheet.Content mx="auto">
-          <Box w="100%" h={60} px={4} justifyContent="center">
-            <Text fontSize="16" color="gray.500" _dark={{
-            color: "gray.300"
-          }}>
-              <FontAwesome5 name="filter" size={24} color="black" /> Filter Items
-            </Text>
-          </Box>
-          <Actionsheet.Item onPress={() => {openFilter(!filter);}}>All</Actionsheet.Item>
-          <Actionsheet.Item onPress={() => {openFilter(!filter);}}>Active</Actionsheet.Item>
-          <Actionsheet.Item onPress={() => {openFilter(!filter);}}>In Progress</Actionsheet.Item>
-          <Actionsheet.Item onPress={() => {openFilter(!filter);}}>Done</Actionsheet.Item>
-        </Actionsheet.Content>
-      </Actionsheet>
-    </Center>
 
     <Modal isOpen={itemsModal} onClose={() => openItemsModal(false)} size="lg">
           <Modal.Content maxWidth="350">
@@ -67,7 +48,7 @@ export default function List() {
       </Modal>
 
     </View>
-      </Box>
+      </>
       {data?.length > 0 ? 
 
       <FlatList style={styles.list} data={data} renderItem={({
@@ -76,7 +57,7 @@ export default function List() {
       borderColor: "gray.600"
     }} borderColor="coolGray.200" pl="4" pr="5" py="2">
             <HStack space={3} justifyContent="space-between">
-              <Text style={styles.itemText} fontSize="xl">{item.text}</Text> 
+              <Text style={{maxWidth: "47%"}} fontSize="xl">{item.text}</Text> 
               <Spacer />
               <Button style={styles.listBtn} variant="ghost" colorScheme="secondary" onPress={() => deleteFromTable({id: item.id})} endIcon={<Icon as={AntDesign} name="delete" />}></Button>
               <Button style={styles.listBtn} variant="ghost" onPress={() => {setOpenEdit(true); setValues({id: item.id, text: item.text, status: item.status, created: item.created})}} endIcon={<Icon as={Entypo} name="edit" />}></Button>
@@ -149,9 +130,6 @@ const styles = StyleSheet.create({
     zIndex: 5,
     justifyContent: "center",
     },
-  itemText: {
-    maxWidth: "47%",
-  },
   list: {
     marginTop: 10,
     height: "100%",
@@ -162,16 +140,9 @@ const styles = StyleSheet.create({
     width: "98%",
     marginLeft: "1%",
   },
-
-
-  fab: {  
-    position: 'absolute',
-    bottom: 0,
-    right: 20
-},
 fabDelete: {  
   position: 'absolute',
   bottom: 0,
-  right: 80
+  right: 20
 },
 })

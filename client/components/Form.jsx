@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
-import {View, StyleSheet, Text} from 'react-native'
+import { StyleSheet, Text} from 'react-native'
 import {insertIntoTable} from '../database/db'
 import { FontAwesome, AntDesign } from '@expo/vector-icons';
-import {Input, Box, Button, Icon, Container, Center, Divider, useToast} from 'native-base'
+import {Input, Box, Button, Icon, Container, Center, useToast} from 'native-base'
 
 export default function Form() {
     const toast = useToast();
@@ -20,17 +20,14 @@ export default function Form() {
     }
 
         return(
-            <View>
                 <Center>
-                    <Container style={styles.form}>
+                    <Container style={{zIndex: 20}}>
                         <Input placeholder="What needs to be done?" value={text} onChangeText={(value) => setText(value)} my="3" />
                         <Box mx="auto">
                             <Button variant="subtle" onPress={() => hSubmit()} endIcon={<Icon as={FontAwesome} name="send" />} size="md"></Button>
                         </Box>
-                        <Divider my="2" thickness="2" bg="emerald.600" />
-                </Container>
-                    </Center>
-            </View>
+                    </Container>
+                </Center>
         )
 }
 
@@ -54,7 +51,4 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         color: "rgba(149, 19, 25, 0.8)",
     }, 
-    form: {
-        zIndex: 20,
-    }
 })
