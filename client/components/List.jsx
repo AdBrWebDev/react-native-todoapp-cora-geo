@@ -1,10 +1,8 @@
 import React, {useState, useEffect} from 'react';
-import { Box, FlatList, Heading, Actionsheet, Fab, HStack, Text, Input, Spacer, Button, Icon, Modal, Select, CheckIcon, Center, Typography } from "native-base";
-import {AntDesign, Entypo, MaterialCommunityIcons, MaterialIcons, FontAwesome5} from '@expo/vector-icons';
+import { Box, FlatList, Heading, Fab, HStack, Text, Input, Spacer, Button, Icon, Modal, Select, CheckIcon, Center, useToast, Container } from "native-base";
+import {AntDesign, Entypo, MaterialCommunityIcons, MaterialIcons, FontAwesome} from '@expo/vector-icons';
 import { StyleSheet, View } from 'react-native';
-import { deleteFromTable, editItem, deleteAllItemsDB } from '../database/db';
-import * as SQLite from 'expo-sqlite'
-const db = SQLite.openDatabase('db.todoDb')
+import { deleteFromTable, editItem, deleteAllItemsDB, selectItems, insertIntoTable } from '../database/db';
 
 export default function List() {
   const [openEdit, setOpenEdit] = useState(false);
@@ -14,17 +12,56 @@ export default function List() {
   const [status, setStatus] = useState(null);
   const [data, setData] = useState([]);
   const [itemsModal, openItemsModal] = useState(false);
+  const toast = useToast();
+  const [text, setText] = useState('');
+
+  async function loadItems() {
+    await selectItems().then(result => {
+      setData(result);
+    })
+  }
+
+  async function removeItem(props){
+    await deleteFromTable({id: props.id})
+    loadItems()
+  }
+
+  async function edit(){
+    await editItem({status: (status !== null) ? status : values.status, text: (editedText === "") ? values.text : editedText, id: values.id  }); 
+    loadItems()
+  }
+
+  async function removeAll() {
+    await deleteAllItemsDB()
+    loadItems()
+  }
+    
+    const hSubmit = () => {
+        if(text === '') {
+            toast.show({render: () => {
+                return <Box style={styles.toaster} color="white" bg="secondary.300" px="2" py="1" rounded="lg" mb={5}><AntDesign style={styles.toasterIcon} name="warning" size={24} /> <Text style={styles.toastText}>Empty input</Text></Box>
+            }});
+        }else{
+          insertIntoTable({text: text});
+          loadItems()
+          setText('');
+        }
+      }
 
   useEffect(() => {
-    db.transaction(tx => {
-      tx.executeSql('SELECT * FROM items', null,
-        (txObj, resultSet) => setData(resultSet.rows._array),
-        (txObj, error) => console.log('Error ', error)
-        )
-    });
-  });
+    loadItems();
+  } , []);
 
-        return (
+        return (<View style={{flex: 1}}>
+        <Center>
+                    <Container style={{zIndex: 20}}>
+                        <Input placeholder="What needs to be done?" value={text} onChangeText={(value) => setText(value)} mb="3" />
+                        <Box mx="auto">
+                            <Button variant="subtle" onPress={() => hSubmit()} endIcon={<Icon as={FontAwesome} name="send" />} size="md"></Button>
+                        </Box>
+                    </Container>
+                </Center>
+        
             <Box style={styles.list}>
       <><Heading fontSize="xl" p="4" pb="3">
         Items
@@ -41,7 +78,7 @@ export default function List() {
           <Modal.Header>Remove all items from list ?</Modal.Header>
           <Modal.Body>
             <Box>
-            <Button mx="auto" colorScheme="secondary" onPress={() => {deleteAllItemsDB(); openItemsModal(false)}} ><Icon size="lg" color="white" as={MaterialIcons} name="delete" /></Button>
+            <Button mx="auto" colorScheme="secondary" onPress={() => {removeAll(); openItemsModal(false)}} ><Icon size="lg" color="white" as={MaterialIcons} name="delete" /></Button>
             </Box>
          </Modal.Body>
         </Modal.Content>
@@ -59,7 +96,7 @@ export default function List() {
             <HStack space={3} justifyContent="space-between">
               <Text style={{maxWidth: "47%"}} fontSize="xl">{item.text}</Text> 
               <Spacer />
-              <Button style={styles.listBtn} variant="ghost" colorScheme="secondary" onPress={() => deleteFromTable({id: item.id})} endIcon={<Icon as={AntDesign} name="delete" />}></Button>
+              <Button style={styles.listBtn} variant="ghost" colorScheme="secondary" onPress={() => removeItem({id: item.id})} endIcon={<Icon as={AntDesign} name="delete" />}></Button>
               <Button style={styles.listBtn} variant="ghost" onPress={() => {setOpenEdit(true); setValues({id: item.id, text: item.text, status: item.status, created: item.created})}} endIcon={<Icon as={Entypo} name="edit" />}></Button>
               <Button style={styles.listBtn} variant="ghost" onPress={() => {setOpenInfo(true); setValues({id: item.id, text: item.text, status: item.status, created: item.created, updated: item.updated})}} endIcon={<Icon as={Entypo} name="info" />}></Button>
             </HStack>
@@ -96,7 +133,7 @@ export default function List() {
           <Modal.Footer>
             <Box mx="auto">
           <Button onPress={() => {
-            editItem({status: (status !== null) ? status : values.status, text: (editedText === "") ? values.text : editedText, id: values.id  }); 
+            edit()
             setOpenEdit(false)
             setStatus("")
             setEditedText("")
@@ -112,7 +149,7 @@ export default function List() {
             <Text style={styles.emptyListText}>No items</Text>
             </Center>}
     </Box>
-        )  
+    </View>)  
 }
 
 const styles = StyleSheet.create({
@@ -145,4 +182,24 @@ fabDelete: {
   bottom: 0,
   right: 20
 },
+
+toastText: {
+  fontSize: 16,
+  fontWeight: "bold",
+  color: "rgba(149, 19, 25, 0.8)",
+  position: "absolute",
+  left: 50,
+},
+toaster: {
+  flex: 1,
+  minWidth: 200,
+  height: 50,
+  justifyContent: "center",
+  alignContent: "center",
+},
+toasterIcon: {
+  position: "absolute",
+  marginLeft: 20,
+  color: "rgba(149, 19, 25, 0.8)",
+}, 
 })
