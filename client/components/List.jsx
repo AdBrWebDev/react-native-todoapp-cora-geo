@@ -29,6 +29,7 @@ export default function List() {
   async function edit(){
     await editItem({status: (status !== null) ? status : values.status, text: (editedText === "") ? values.text : editedText, id: values.id  }); 
     loadItems()
+    setStatus(null)
   }
 
   async function removeAll() {
